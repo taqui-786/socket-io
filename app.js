@@ -52,7 +52,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("post-liked", ({ postUsername, postId }) => {
-    console.log(`Post liked by ${username}`);
     const targetSocketId = userSocketMap.get(postUsername);
 
     if (targetSocketId) {
@@ -64,11 +63,19 @@ io.on("connection", (socket) => {
   });
 
   socket.on("new-message-sent", ({ message, friendId }) => {
-    console.log(`Message sent to ${friendId}`);
     const targetSocketId = userSocketMap.get(friendId);
 
     if (targetSocketId) {
       io.to(targetSocketId).emit("new-message-received", message);
+    }
+  });
+
+  socket.on("new-chat-created", (friendId) => {
+    const targetSocketId = userSocketMap.get(friendId);
+    console.log("new chat created" + targetSocketId);
+    
+    if (targetSocketId) {
+      io.to(targetSocketId).emit("refresh-chat-feed");
     }
   });
 
